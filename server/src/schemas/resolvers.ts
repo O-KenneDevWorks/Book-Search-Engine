@@ -1,12 +1,7 @@
 import { UserInputError } from 'apollo-server-express';
 import User from '../models/User.js';
-import { signToken } from '../services/auth.js';
-import { JwtPayload } from '../services/auth'; // Ensure JwtPayload type exists for the token payload
+import { signToken, AuthenticationError } from '../services/auth.js'; // Import JwtPayload
 
-// Define the context interface
-interface Context {
-  user?: JwtPayload;
-}
 
 interface BookInput {
   bookId: string;
@@ -19,12 +14,15 @@ interface BookInput {
 
 export const resolvers = {
   Query: {
-    me: async (_: unknown, __: unknown, context: Context) => {
+    me: async (_: unknown, __: unknown, context: any) => {
       const { user } = context;
       if (!user) {
-        throw new UserInputError('Not authenticated');
+        throw new AuthenticationError('Not authenticated');
       }
       return await User.findById(user._id);
+    },
+    getAllUsers: async () => {
+      return await User.find(); // Fetch all users
     },
   },
   Mutation: {
@@ -34,12 +32,12 @@ export const resolvers = {
     ) => {
       const user = await User.findOne({ email });
       if (!user) {
-        throw new UserInputError("Can't find this user");
+        throw new AuthenticationError("Can't find this user");
       }
 
       const correctPw = await user.isCorrectPassword(password);
       if (!correctPw) {
-        throw new UserInputError('Incorrect password');
+        throw new AuthenticationError('Incorrect password');
       }
 
       const token = signToken(user.username, user.email, user._id);
@@ -62,11 +60,11 @@ export const resolvers = {
     saveBook: async (
       _: unknown,
       { bookData }: { bookData: BookInput },
-      context: Context
+      context: any
     ) => {
       const { user } = context;
       if (!user) {
-        throw new UserInputError('Not authenticated');
+        throw new AuthenticationError('Not authenticated');
       }
 
       const updatedUser = await User.findByIdAndUpdate(
@@ -80,11 +78,11 @@ export const resolvers = {
     removeBook: async (
       _: unknown,
       { bookId }: { bookId: string },
-      context: Context
+      context: any
     ) => {
       const { user } = context;
       if (!user) {
-        throw new UserInputError('Not authenticated');
+        throw new AuthenticationError('Not authenticated');
       }
 
       const updatedUser = await User.findByIdAndUpdate(

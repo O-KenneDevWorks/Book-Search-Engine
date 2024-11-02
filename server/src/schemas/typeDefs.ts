@@ -33,6 +33,7 @@ export const typeDefs = gql`
   }
 
   type Query {
+    getAllUsers: [User!]!
     me: User
   }
 
