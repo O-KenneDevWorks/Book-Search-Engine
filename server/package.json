@@ -5,10 +5,15 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
+    "build": "npx tsc",
+    "start": "npm run build && node dist/server.js --ignore client",
     "watch": "nodemon dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "nodemonConfig": {
+    "watch": ["src"],
+    "ext": "ts,json,js",
+    "exec": "npx tsc && node dist/server.js"
   },
   "keywords": [],
   "author": "",
