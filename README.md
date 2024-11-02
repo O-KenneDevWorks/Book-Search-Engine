@@ -64,7 +64,7 @@ Install from the root directory
 npm install
 ```
 
-## Running the Application
+### Running the Application
 
 1. **Start MongoDB**: Make sure your MongoDB instance is running.
 
